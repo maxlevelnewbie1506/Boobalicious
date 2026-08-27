@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { ImageUploader } from "@/components/ImageUploader";
+import type { Game } from "@/lib/types";
 
 function slugify(input: string) {
   return input
@@ -13,6 +14,8 @@ function slugify(input: string) {
     .replace(/(^-|-$)/g, "");
 }
 
+type GameWithCount = Game & { characters: { count: number }[] };
+
 export default function NewGamePage() {
   const router = useRouter();
   const supabase = createClient();
@@ -21,6 +24,34 @@ export default function NewGamePage() {
   const [iconUrl, setIconUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  const [games, setGames] = useState<GameWithCount[]>([]);
+  const [loadingGames, setLoadingGames] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  async function loadGames() {
+    setLoadingGames(true);
+    const { data } = await supabase
+      .from("games")
+      .select("*, characters(count)")
+      .order("name");
+    setGames((data as GameWithCount[]) ?? []);
+    setLoadingGames(false);
+  }
+
+  useEffect(() => {
+    async function load() {
+      setLoadingGames(true);
+      const { data } = await supabase
+        .from("games")
+        .select("*, characters(count)")
+        .order("name");
+      setGames((data as GameWithCount[]) ?? []);
+      setLoadingGames(false);
+    }
+    load();
+  }, [supabase]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -40,7 +71,37 @@ export default function NewGamePage() {
       return;
     }
 
-    router.push("/edit");
+    setName("");
+    setIconUrl(null);
+    await loadGames();
+    router.refresh();
+  }
+
+  async function handleDelete(game: GameWithCount) {
+    const characterCount = game.characters?.[0]?.count ?? 0;
+    const warning =
+      characterCount > 0
+        ? `Delete "${game.name}"? This will also permanently delete its ${characterCount} character${
+            characterCount === 1 ? "" : "s"
+          } and all of their gallery images. This cannot be undone.`
+        : `Delete "${game.name}"? This cannot be undone.`;
+
+    const confirmed = window.confirm(warning);
+    if (!confirmed) return;
+
+    setDeletingId(game.id);
+    setDeleteError(null);
+
+    const { error: deleteError } = await supabase.from("games").delete().eq("id", game.id);
+
+    setDeletingId(null);
+
+    if (deleteError) {
+      setDeleteError(deleteError.message);
+      return;
+    }
+
+    await loadGames();
     router.refresh();
   }
 
@@ -85,6 +146,48 @@ export default function NewGamePage() {
           {saving ? "Saving…" : "Create game"}
         </button>
       </form>
+
+      <div className="tape-rule mt-12" />
+
+      <h2 className="mt-8 font-display text-xl text-[var(--paper)]">Existing games</h2>
+
+      {loadingGames ? (
+        <p className="mt-4 font-mono text-xs uppercase tracking-[0.15em] text-[var(--paper-dim)]">
+          Loading…
+        </p>
+      ) : games.length === 0 ? (
+        <p className="mt-4 font-mono text-xs uppercase tracking-[0.15em] text-[var(--paper-dim)]">
+          No games catalogued yet.
+        </p>
+      ) : (
+        <ul className="mt-4 divide-y divide-[var(--hairline)]">
+          {games.map((game) => {
+            const count = game.characters?.[0]?.count ?? 0;
+            return (
+              <li key={game.id} className="flex items-center justify-between py-3">
+                <div>
+                  <p className="font-display text-base text-[var(--paper)]">{game.name}</p>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[var(--paper-dim)]">
+                    {count} character{count === 1 ? "" : "s"}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleDelete(game)}
+                  disabled={deletingId === game.id}
+                  className="rounded-sm border border-[var(--tape)] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.15em] text-[var(--tape)] transition-opacity hover:opacity-90 disabled:opacity-50"
+                >
+                  {deletingId === game.id ? "Deleting…" : "Delete"}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      {deleteError && (
+        <p className="mt-3 font-mono text-xs text-[var(--tape)]">{deleteError}</p>
+      )}
     </div>
   );
 }
