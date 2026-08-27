@@ -20,7 +20,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "VitalStats Archive",
+  title: "Boobalicious",
   description: "A fan-run measurement archive for gacha game characters.",
 };
 

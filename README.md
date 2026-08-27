@@ -1,4 +1,4 @@
-# VitalStats Archive
+# Boobalicious
 
 A fan-run archive cataloguing chest / waist / hip measurements for female
 characters across gacha games, starting with Wuthering Waves. Built to scale
