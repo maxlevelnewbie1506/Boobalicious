@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { StatRow } from "@/components/StatRow";
+import { GalleryLightbox } from "@/components/GalleryLightbox";
 import type { GalleryImage } from "@/lib/types";
 
 export default async function CharacterPage({
@@ -83,6 +84,9 @@ export default async function CharacterPage({
           <div className="tape-rule mt-8" />
 
           <div className="mt-2">
+            <StatRow label="Age" value={character.age} />
+            <StatRow label="Height" value={character.height} />
+            <StatRow label="Weight" value={character.weight} />
             <StatRow label="Chest (band / under / cup)" value={chest || null} />
             <StatRow label="Waist" value={character.waist} />
             <StatRow label="Hip" value={character.hip} />
@@ -101,20 +105,8 @@ export default async function CharacterPage({
         <div className="mt-16">
           <h2 className="font-display text-2xl text-[var(--paper)]">Gallery</h2>
           <div className="tape-rule mt-4" />
-          <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-            {(gallery as GalleryImage[]).map((img) => (
-              <div
-                key={img.id}
-                className="relative aspect-square overflow-hidden rounded-sm border border-[var(--hairline)] bg-[var(--surface)]"
-              >
-                <Image src={img.image_url} alt={img.caption ?? character.name} fill className="object-cover" />
-                {img.caption && (
-                  <div className="absolute inset-x-0 bottom-0 bg-black/70 px-2 py-1 font-mono text-[10px] text-[var(--paper)]">
-                    {img.caption}
-                  </div>
-                )}
-              </div>
-            ))}
+          <div className="mt-8">
+            <GalleryLightbox images={gallery as GalleryImage[]} altBase={character.name} />
           </div>
         </div>
       )}
