@@ -29,6 +29,9 @@ export default function NewPostPage() {
   const [chestCup, setChestCup] = useState("");
   const [waist, setWaist] = useState("");
   const [hip, setHip] = useState("");
+  const [height, setHeight] = useState("");
+  const [weight, setWeight] = useState("");
+  const [age, setAge] = useState("");
   const [sourceNote, setSourceNote] = useState("");
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
   const [galleryUrls, setGalleryUrls] = useState<string[]>([]);
@@ -62,6 +65,9 @@ export default function NewPostPage() {
         chest_cup: chestCup.trim() || null,
         waist: waist.trim() || null,
         hip: hip.trim() || null,
+        height: height.trim() || null,
+        weight: weight.trim() || null,
+        age: age.trim() || null,
         source_note: sourceNote.trim() || null,
         cover_image_url: coverUrl,
       })
@@ -166,6 +172,47 @@ export default function NewPostPage() {
               rows={4}
               className="mt-1 w-full rounded-sm border border-[var(--hairline)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--paper)] outline-none focus:border-[var(--tape)]"
             />
+          </div>
+
+          <div className="tape-rule" />
+
+          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--paper-dim)]">
+            Vitals
+          </p>
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <label className="font-mono text-[10px] uppercase tracking-[0.15em] text-[var(--paper-dim)]">
+                Age
+              </label>
+              <input
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+                placeholder="e.g. 19"
+                className="mt-1 w-full rounded-sm border border-[var(--hairline)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--paper)] outline-none focus:border-[var(--tape)]"
+              />
+            </div>
+            <div>
+              <label className="font-mono text-[10px] uppercase tracking-[0.15em] text-[var(--paper-dim)]">
+                Height
+              </label>
+              <input
+                value={height}
+                onChange={(e) => setHeight(e.target.value)}
+                placeholder="e.g. 165cm"
+                className="mt-1 w-full rounded-sm border border-[var(--hairline)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--paper)] outline-none focus:border-[var(--tape)]"
+              />
+            </div>
+            <div>
+              <label className="font-mono text-[10px] uppercase tracking-[0.15em] text-[var(--paper-dim)]">
+                Weight
+              </label>
+              <input
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
+                placeholder="e.g. 50kg"
+                className="mt-1 w-full rounded-sm border border-[var(--hairline)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--paper)] outline-none focus:border-[var(--tape)]"
+              />
+            </div>
           </div>
 
           <div className="tape-rule" />
