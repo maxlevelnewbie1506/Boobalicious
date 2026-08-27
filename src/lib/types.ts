@@ -18,6 +18,9 @@ export type Character = {
   chest_cup: string | null;
   waist: string | null;
   hip: string | null;
+  height: string | null;
+  weight: string | null;
+  age: string | null;
   source_note: string | null;
   created_at: string;
   updated_at: string;
