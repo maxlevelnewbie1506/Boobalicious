@@ -5,17 +5,9 @@ import { SignOutButton } from "@/components/SignOutButton";
 export default async function EditDashboard() {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: isAdminResult } = await supabase.rpc("is_admin");
 
-  const { data: adminRow } = await supabase
-    .from("admins")
-    .select("user_id")
-    .eq("user_id", user?.id ?? "")
-    .maybeSingle();
-
-  const isAdmin = Boolean(adminRow);
+  const isAdmin = Boolean(isAdminResult);
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">
@@ -74,3 +66,4 @@ export default async function EditDashboard() {
     </div>
   );
 }
+
