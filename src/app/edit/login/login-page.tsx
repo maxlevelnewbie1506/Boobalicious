@@ -17,17 +17,26 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
 
-    setLoading(false);
+      if (error) {
+        setError(error.message);
+        setLoading(false);
+        return;
+      }
 
-    if (error) {
-      setError("Sign-in failed. Check your email and password.");
-      return;
+      router.push("/edit");
+      router.refresh();
+    } catch (err) {
+      console.error("Sign-in threw an exception:", err);
+      setError(
+        err instanceof Error
+          ? `Unexpected error: ${err.message}`
+          : "Unexpected error signing in. Check the browser console."
+      );
+      setLoading(false);
     }
-
-    router.push("/edit");
-    router.refresh();
   }
 
   return (
