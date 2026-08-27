@@ -59,6 +59,9 @@ export default function EditPostPage() {
         chest_cup: character.chest_cup,
         waist: character.waist,
         hip: character.hip,
+        height: character.height,
+        weight: character.weight,
+        age: character.age,
         source_note: character.source_note,
         cover_image_url: character.cover_image_url,
       })
@@ -174,6 +177,44 @@ export default function EditPostPage() {
             rows={4}
             className="mt-1 w-full rounded-sm border border-[var(--hairline)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--paper)] outline-none focus:border-[var(--tape)]"
           />
+        </div>
+
+        <div className="tape-rule" />
+
+        <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--paper-dim)]">
+          Vitals
+        </p>
+        <div className="grid grid-cols-3 gap-3">
+          <div>
+            <label className="font-mono text-[10px] uppercase tracking-[0.15em] text-[var(--paper-dim)]">
+              Age
+            </label>
+            <input
+              value={character.age ?? ""}
+              onChange={(e) => update("age", e.target.value)}
+              className="mt-1 w-full rounded-sm border border-[var(--hairline)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--paper)] outline-none focus:border-[var(--tape)]"
+            />
+          </div>
+          <div>
+            <label className="font-mono text-[10px] uppercase tracking-[0.15em] text-[var(--paper-dim)]">
+              Height
+            </label>
+            <input
+              value={character.height ?? ""}
+              onChange={(e) => update("height", e.target.value)}
+              className="mt-1 w-full rounded-sm border border-[var(--hairline)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--paper)] outline-none focus:border-[var(--tape)]"
+            />
+          </div>
+          <div>
+            <label className="font-mono text-[10px] uppercase tracking-[0.15em] text-[var(--paper-dim)]">
+              Weight
+            </label>
+            <input
+              value={character.weight ?? ""}
+              onChange={(e) => update("weight", e.target.value)}
+              className="mt-1 w-full rounded-sm border border-[var(--hairline)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--paper)] outline-none focus:border-[var(--tape)]"
+            />
+          </div>
         </div>
 
         <div className="tape-rule" />
