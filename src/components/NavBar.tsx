@@ -11,6 +11,9 @@ export function NavBar() {
           <Link href="/" className="transition-colors hover:text-[var(--paper)]">
             Games
           </Link>
+          <Link href="/about" className="transition-colors hover:text-[var(--paper)]">
+            About
+          </Link>
           <Link href="/edit" className="transition-colors hover:text-[var(--tape)]">
             Edit
           </Link>

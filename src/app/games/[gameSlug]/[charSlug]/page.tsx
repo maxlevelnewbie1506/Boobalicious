@@ -1,10 +1,11 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { StatRow } from "@/components/StatRow";
 import { GalleryLightbox } from "@/components/GalleryLightbox";
-import type { GalleryImage } from "@/lib/types";
+import { MoreFromGame } from "@/components/MoreFromGame";
+import type { GalleryImage, Character } from "@/lib/types";
 
 export default async function CharacterPage({
   params,
@@ -31,24 +32,40 @@ export default async function CharacterPage({
 
   if (!character) notFound();
 
-  const { data: gallery } = await supabase
-    .from("character_gallery")
-    .select("*")
-    .eq("character_id", character.id)
-    .order("sort_order", { ascending: true });
+  const [{ data: gallery }, { data: moreCharacters }] = await Promise.all([
+    supabase
+      .from("character_gallery")
+      .select("*")
+      .eq("character_id", character.id)
+      .order("sort_order", { ascending: true }),
+    supabase
+      .from("characters")
+      .select("*")
+      .eq("game_id", game.id)
+      .neq("id", character.id)
+      .limit(4),
+    supabase.rpc("increment_view_count", { character_id: character.id }),
+  ]);
 
   const chest = [character.chest_top, character.chest_underbust, character.chest_cup]
     .filter(Boolean)
     .join(" / ");
 
+  const updatedAt = new Date(character.updated_at).toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
   return (
     <div className="mx-auto max-w-5xl px-6 py-16">
-      <Link
-        href={`/games/${game.slug}`}
-        className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--paper-dim)] hover:text-[var(--tape)]"
-      >
-        ← {game.name}
-      </Link>
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/" },
+          { label: game.name, href: `/games/${game.slug}` },
+          { label: character.name },
+        ]}
+      />
 
       <div className="mt-6 grid grid-cols-1 gap-10 md:grid-cols-[minmax(0,320px)_1fr]">
         {/* Portrait */}
@@ -92,11 +109,10 @@ export default async function CharacterPage({
             <StatRow label="Hip" value={character.hip} />
           </div>
 
-          {character.source_note && (
-            <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.15em] text-[var(--paper-dim)]">
-              Source: {character.source_note}
-            </p>
-          )}
+          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[10px] uppercase tracking-[0.15em] text-[var(--paper-dim)]">
+            {character.source_note && <span>Source: {character.source_note}</span>}
+            <span>Updated {updatedAt}</span>
+          </div>
         </div>
       </div>
 
@@ -109,6 +125,10 @@ export default async function CharacterPage({
             <GalleryLightbox images={gallery as GalleryImage[]} altBase={character.name} />
           </div>
         </div>
+      )}
+
+      {moreCharacters && (
+        <MoreFromGame characters={moreCharacters as Character[]} gameSlug={game.slug} />
       )}
     </div>
   );

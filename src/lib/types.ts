@@ -22,6 +22,7 @@ export type Character = {
   weight: string | null;
   age: string | null;
   source_note: string | null;
+  view_count: number;
   created_at: string;
   updated_at: string;
 };

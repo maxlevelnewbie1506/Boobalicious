@@ -6,7 +6,7 @@ export function GameCard({ game }: { game: Game }) {
   return (
     <Link
       href={`/games/${game.slug}`}
-      className="group fade-up relative overflow-hidden rounded-sm border border-[var(--hairline)] bg-[var(--surface)] transition-colors hover:border-[var(--tape-dim)]"
+      className="group fade-up relative overflow-hidden rounded-sm border border-[var(--hairline)] bg-[var(--surface)] transition-all duration-300 hover:-translate-y-1 hover:border-[var(--tape-dim)] hover:shadow-[0_12px_24px_-8px_rgba(0,0,0,0.5)]"
     >
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-[var(--surface-raised)]">
         {game.icon_url ? (

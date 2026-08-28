@@ -29,6 +29,26 @@ body {
   color: var(--paper);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
+  position: relative;
+}
+
+/* Subtle grain texture over the whole site, sits above the background
+   but never interferes with clicks/scrolling. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+#__next,
+body > div {
+  position: relative;
+  z-index: 2;
 }
 
 ::selection {
@@ -96,5 +116,25 @@ body {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--surface) 25%,
+    var(--surface-raised) 37%,
+    var(--surface) 63%
+  );
+  background-size: 400% 100%;
+  animation: skeleton-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes skeleton-pulse {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
   }
 }

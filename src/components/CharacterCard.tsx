@@ -12,7 +12,7 @@ export function CharacterCard({
   return (
     <Link
       href={`/games/${gameSlug}/${character.slug}`}
-      className="group fade-up relative overflow-hidden rounded-sm border border-[var(--hairline)] bg-[var(--surface)] transition-colors hover:border-[var(--tape-dim)]"
+      className="group fade-up relative overflow-hidden rounded-sm border border-[var(--hairline)] bg-[var(--surface)] transition-all duration-300 hover:-translate-y-1 hover:border-[var(--tape-dim)] hover:shadow-[0_12px_24px_-8px_rgba(0,0,0,0.5)]"
     >
       <div className="relative aspect-[3/4] w-full overflow-hidden bg-[var(--surface-raised)]">
         {character.cover_image_url ? (

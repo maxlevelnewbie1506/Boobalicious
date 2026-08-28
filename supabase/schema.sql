@@ -30,7 +30,11 @@ create table if not exists characters (
   chest_cup         text,   -- cup size, e.g. "C"
   waist             text,
   hip               text,
+  height            text,
+  weight            text,
+  age               text,   -- kept as text: many characters have non-numeric ages (e.g. "unknown", "1000+ years")
   source_note       text,   -- optional credit / where the estimate came from
+  view_count        integer not null default 0,
   created_at        timestamptz not null default now(),
   updated_at        timestamptz not null default now(),
   unique (game_id, slug)
@@ -66,6 +70,18 @@ as $$
     select 1 from admins where user_id = auth.uid()
   );
 $$;
+
+-- Lets anonymous visitors increment a character's view counter without
+-- being able to write anything else on the row (see write policies below).
+create or replace function increment_view_count(character_id uuid)
+returns void
+language sql
+security definer
+as $$
+  update characters set view_count = view_count + 1 where id = character_id;
+$$;
+
+grant execute on function increment_view_count(uuid) to anon, authenticated;
 
 -- ------------------------------------------------------------
 -- Row Level Security
