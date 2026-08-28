@@ -3,35 +3,40 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import type { Game } from "@/lib/types";
 
-export function HeroBanner({ games }: { games: Game[] }) {
-  const withImages = games.filter((g) => g.icon_url);
+export type HeroSlide = {
+  key: string;
+  image_url: string;
+  game_name: string;
+  game_slug: string;
+};
+
+export function HeroBanner({ slides }: { slides: HeroSlide[] }) {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
-    if (withImages.length < 2) return;
+    if (slides.length < 2) return;
     const id = setInterval(() => {
-      setIndex((i) => (i + 1) % withImages.length);
+      setIndex((i) => (i + 1) % slides.length);
     }, 5000);
     return () => clearInterval(id);
-  }, [withImages.length]);
+  }, [slides.length]);
 
-  if (withImages.length === 0) return null;
+  if (slides.length === 0) return null;
 
-  const featured = withImages[index];
+  const featured = slides[index];
 
   return (
     <div className="relative -mx-6 mb-16 h-[46vh] min-h-[320px] overflow-hidden sm:mx-0 sm:rounded-sm sm:border sm:border-[var(--hairline)]">
-      {withImages.map((game, i) => (
+      {slides.map((slide, i) => (
         <div
-          key={game.id}
+          key={slide.key}
           className="absolute inset-0 transition-opacity duration-1000"
           style={{ opacity: i === index ? 1 : 0 }}
         >
           <Image
-            src={game.icon_url!}
-            alt={game.name}
+            src={slide.image_url}
+            alt={slide.game_name}
             fill
             priority={i === 0}
             className="object-cover"
@@ -50,18 +55,18 @@ export function HeroBanner({ games }: { games: Game[] }) {
         </h1>
         <div className="mt-5 flex flex-wrap items-center gap-4">
           <Link
-            href={`/games/${featured.slug}`}
+            href={`/games/${featured.game_slug}`}
             className="rounded-sm bg-[var(--tape)] px-4 py-2 font-mono text-xs uppercase tracking-[0.2em] text-[var(--ink)] transition-opacity hover:opacity-90"
           >
-            Explore {featured.name} →
+            Explore {featured.game_name} →
           </Link>
-          {withImages.length > 1 && (
+          {slides.length > 1 && (
             <div className="flex gap-1.5">
-              {withImages.map((g, i) => (
+              {slides.map((slide, i) => (
                 <button
-                  key={g.id}
+                  key={slide.key}
                   type="button"
-                  aria-label={`Show ${g.name}`}
+                  aria-label={`Show ${slide.game_name}`}
                   onClick={() => setIndex(i)}
                   className="h-1.5 w-6 rounded-full transition-colors"
                   style={{

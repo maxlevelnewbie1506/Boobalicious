@@ -36,4 +36,12 @@ export type GalleryImage = {
   created_at: string;
 };
 
+export type HeroImage = {
+  id: string;
+  game_id: string;
+  image_url: string;
+  sort_order: number;
+  created_at: string;
+};
+
 export type CharacterWithGame = Character & { games: Pick<Game, "name" | "slug"> };

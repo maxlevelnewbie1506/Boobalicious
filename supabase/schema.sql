@@ -49,6 +49,16 @@ create table if not exists character_gallery (
   created_at    timestamptz not null default now()
 );
 
+-- Per-game hero banner images (separate from a game's card icon_url),
+-- shown rotating on the homepage.
+create table if not exists game_hero_images (
+  id          uuid primary key default gen_random_uuid(),
+  game_id     uuid not null references games(id) on delete cascade,
+  image_url   text not null,
+  sort_order  int not null default 0,
+  created_at  timestamptz not null default now()
+);
+
 -- Admin allowlist: which authenticated users are allowed to write.
 -- Add rows here (by auth.users id) for each admin account.
 create table if not exists admins (
@@ -90,6 +100,7 @@ grant execute on function increment_view_count(uuid) to anon, authenticated;
 alter table games enable row level security;
 alter table characters enable row level security;
 alter table character_gallery enable row level security;
+alter table game_hero_images enable row level security;
 alter table admins enable row level security;
 
 -- Public read access for everyone (including anonymous visitors)
@@ -140,6 +151,22 @@ create policy "admins can update gallery images"
 
 create policy "admins can delete gallery images"
   on character_gallery for delete
+  using (is_admin());
+
+create policy "hero images are viewable by everyone"
+  on game_hero_images for select
+  using (true);
+
+create policy "admins can insert hero images"
+  on game_hero_images for insert
+  with check (is_admin());
+
+create policy "admins can update hero images"
+  on game_hero_images for update
+  using (is_admin());
+
+create policy "admins can delete hero images"
+  on game_hero_images for delete
   using (is_admin());
 
 -- Nobody can read/write the admins table directly except via is_admin();

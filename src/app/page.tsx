@@ -1,14 +1,19 @@
 import { createClient } from "@/lib/supabase/server";
 import { GameCard } from "@/components/GameCard";
-import { HeroBanner } from "@/components/HeroBanner";
+import { HeroBanner, type HeroSlide } from "@/components/HeroBanner";
 import { MostViewed } from "@/components/MostViewed";
-import type { Game } from "@/lib/types";
+import type { Game, HeroImage } from "@/lib/types";
+
+type GameWithHero = Game & { game_hero_images: HeroImage[] };
 
 export default async function HomePage() {
   const supabase = await createClient();
 
   const [{ data: games }, { data: mostViewed }] = await Promise.all([
-    supabase.from("games").select("*").order("created_at", { ascending: true }),
+    supabase
+      .from("games")
+      .select("*, game_hero_images(*)")
+      .order("created_at", { ascending: true }),
     supabase
       .from("characters")
       .select("*, games(name, slug)")
@@ -17,16 +22,49 @@ export default async function HomePage() {
       .limit(5),
   ]);
 
+  const gamesTyped = (games as GameWithHero[]) ?? [];
+
+  // Build the hero rotation: each game's own uploaded hero images, in order.
+  // A game with no hero images yet falls back to its card cover image, so
+  // the banner still shows something for it until dedicated shots are added.
+  const slides: HeroSlide[] = gamesTyped.flatMap((game) => {
+    const heroImages = [...(game.game_hero_images ?? [])].sort(
+      (a, b) => a.sort_order - b.sort_order
+    );
+
+    if (heroImages.length > 0) {
+      return heroImages.map((img) => ({
+        key: img.id,
+        image_url: img.image_url,
+        game_name: game.name,
+        game_slug: game.slug,
+      }));
+    }
+
+    if (game.icon_url) {
+      return [
+        {
+          key: game.id,
+          image_url: game.icon_url,
+          game_name: game.name,
+          game_slug: game.slug,
+        },
+      ];
+    }
+
+    return [];
+  });
+
   return (
     <div>
-      {games && games.length > 0 && (
+      {slides.length > 0 && (
         <div className="mx-auto max-w-6xl px-6 pt-8">
-          <HeroBanner games={games as Game[]} />
+          <HeroBanner slides={slides} />
         </div>
       )}
 
       <div className="mx-auto max-w-6xl px-6 pb-16">
-        {(!games || games.length === 0) && (
+        {gamesTyped.length === 0 && (
           <>
             <p className="font-mono text-xs uppercase tracking-[0.3em] text-[var(--tape)]">
               Fan-compiled character archive
@@ -46,9 +84,9 @@ export default async function HomePage() {
 
         <div className="tape-rule mt-10" />
 
-        {games && games.length > 0 ? (
+        {gamesTyped.length > 0 ? (
           <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {(games as Game[]).map((game) => (
+            {gamesTyped.map((game) => (
               <GameCard key={game.id} game={game} />
             ))}
           </div>

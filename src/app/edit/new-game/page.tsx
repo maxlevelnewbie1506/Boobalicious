@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { ImageUploader } from "@/components/ImageUploader";
 import type { Game } from "@/lib/types";
@@ -171,14 +172,22 @@ export default function NewGamePage() {
                     {count} character{count === 1 ? "" : "s"}
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => handleDelete(game)}
-                  disabled={deletingId === game.id}
-                  className="rounded-sm border border-[var(--tape)] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.15em] text-[var(--tape)] transition-opacity hover:opacity-90 disabled:opacity-50"
-                >
-                  {deletingId === game.id ? "Deleting…" : "Delete"}
-                </button>
+                <div className="flex items-center gap-2">
+                  <Link
+                    href={`/edit/games/${game.id}`}
+                    className="rounded-sm border border-[var(--hairline)] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.15em] text-[var(--paper-dim)] transition-colors hover:border-[var(--tape-dim)] hover:text-[var(--paper)]"
+                  >
+                    Hero images
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(game)}
+                    disabled={deletingId === game.id}
+                    className="rounded-sm border border-[var(--tape)] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.15em] text-[var(--tape)] transition-opacity hover:opacity-90 disabled:opacity-50"
+                  >
+                    {deletingId === game.id ? "Deleting…" : "Delete"}
+                  </button>
+                </div>
               </li>
             );
           })}
